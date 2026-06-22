@@ -9,6 +9,23 @@ pipeline {
                     url: 'https://github.com/yashwanthnitturi/devsecops-flask-app.git'
             }
         }
+        stage('SonarQube Scan') {
+            steps {
+                script {
+                 def scannerHome = tool 'sonar-scanner'
+
+                withSonarQubeEnv('SonarQube') {
+                sh """
+                ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=devsecops-flask-app \
+                -Dsonar.projectName=devsecops-flask-app \
+                -Dsonar.sources=. \
+                -Dsonar.python.version=3.12
+                """
+            }
+        }
+    }
+}
 
         stage('Build Docker Image') {
             steps {
