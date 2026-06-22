@@ -16,30 +16,29 @@ pipeline {
             }
         }
 
-      stage('Push To ECR') {
-steps {
-withCredentials([usernamePassword(
-credentialsId: 'aws-ecr',
-usernameVariable: 'AWS_ACCESS_KEY_ID',
-passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-)]) {
+        stage('Push To ECR') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'aws-ecr',
+                    usernameVariable: 'AWS_ACCESS_KEY_ID',
+                    passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                )]) {
 
-```
-        sh '''
-        export AWS_DEFAULT_REGION=ap-south-1
+                    sh '''
+                    export AWS_DEFAULT_REGION=ap-south-1
 
-        aws ecr get-login-password --region ap-south-1 | docker login \
-        --username AWS \
-        --password-stdin 123185598576.dkr.ecr.ap-south-1.amazonaws.com
+                    aws ecr get-login-password --region ap-south-1 | docker login \
+                    --username AWS \
+                    --password-stdin 123185598576.dkr.ecr.ap-south-1.amazonaws.com
 
-        docker tag devsecops-app:${BUILD_NUMBER} \
-        123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}
+                    docker tag devsecops-app:${BUILD_NUMBER} \
+                    123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}
 
-        docker push \
-        123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}
-        '''
+                    docker push \
+                    123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}
+                    '''
+                }
+            }
+        }
     }
-}
-```
-
 }
