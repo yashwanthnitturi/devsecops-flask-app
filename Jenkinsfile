@@ -26,13 +26,22 @@ pipeline {
         }
     }
 }
-
+        stage('Trivy Filesystem Scan') {
+            steps {
+                sh 'trivy fs --severity HIGH,CRITICAL .'
+    }
+}
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t devsecops-app:${BUILD_NUMBER} .'
             }
         }
 
+       stage('Trivy Image Scan') {
+           steps {
+               sh 'trivy image --severity HIGH,CRITICAL devsecops-app:${BUILD_NUMBER}'
+    }
+}
         stage('Push To ECR') {
             steps {
                 withCredentials([usernamePassword(
