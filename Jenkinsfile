@@ -62,6 +62,35 @@ pipeline {
 
                     docker push \
                     123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}
+                    
+         stage('Update GitOps Repo') {
+             steps {
+                 withCredentials([usernamePassword(
+            credentialsId: 'github-token',
+            usernameVariable: 'GIT_USER',
+            passwordVariable: 'GIT_PASS'
+        )]) {
+
+            sh '''
+            rm -rf gitops
+
+            git clone https://${GIT_USER}:${GIT_PASS}@github.com/yashwanthnitturi/aws-eks-devsecops-gitops.git gitops
+
+            sed -i "s|image: .*|image: 123185598576.dkr.ecr.ap-south-1.amazonaws.com/devsecops-app:${BUILD_NUMBER}|g" gitops/kubernetes/flask-app/deployment.yaml
+
+            cd gitops
+
+            git config user.email "jenkins@local"
+            git config user.name "Jenkins"
+
+            git add .
+            git commit -m "Update image to build ${BUILD_NUMBER}" || true
+
+            git push origin main
+            '''
+        }
+    }
+}
                     '''
                 }
             }
